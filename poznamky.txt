@@ -10,4 +10,5 @@ od toho budem menit aj farbu policka musí sa zhodovať s Pile
 
 
 // selectRandomPlayerTileTypeFromPile 
-- musi ist do databazy lebo ked pikujem nahodne nekedy je už ta picovina prazdna asi to musim zmeniť na pole alebo nejako inak vymysleť
+-## musi ist do databazy lebo ked pikujem nahodne nekedy je už ta picovina prazdna asi to musim zmeniť na pole alebo nejako inak vymysleť
+-uz to mam - to iste mi treba v tej druhej picovine
