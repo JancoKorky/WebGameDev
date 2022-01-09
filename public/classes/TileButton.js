@@ -29,7 +29,6 @@ class TileButton {
     this.id = id;
     this.setColor();
     this.draw_Button();
-    console.log(this.id);
   }
 
   setColor() {

@@ -2,7 +2,17 @@ let arrTiles = [];
 const BOARD_TILES = 14;
 let boardEnable = false;
 let buildID = undefined;
+let buildFestID = undefined;
+
 let removePlayerBtn = undefined;
+let removeFestBtn = undefined;
+
+let playerBtnEnable = true;
+
+let playerBtn1 = undefined;
+let playerBtn2 = undefined;
+let festivalBtn1 = undefined;
+let festivalBtn2 = undefined;
 
 // THERE IS CONFIGURATION OF TILES
 // let playerType1 = 5; // 1-times plus points from  all tiles around
@@ -10,16 +20,17 @@ let removePlayerBtn = undefined;
 // let playerType3 = 2; // 3-times plus points from  all tiles around
 let playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
 
-let festivalType1 = 3; // set up of BEER TENTS 1 tile
-let festivalType2 = 6; // set up of BEER TENTS 2 tile
-let festivalType3 = 2; // set up of BARS 1 tile
-let festivalType4 = 4; // set up of BARS 2 tile
-let festivalType5 = 3; // set up of STAGE tile
-let festivalType6 = 2; // set up of CHILL ZONE tile
-let festivalType7 = 1; // set up of REFRESHMENT tile
-let festivalType8 = 2; // set up of FOREST TOILET tile
-let festivalType9 = 3; // set up of TOI TOI tile
-let festivalType10 = 2; // set up of EPIC TOILET tile
+// festivalType1  // set up of BEER TENTS 1 tile
+// festivalType2  // set up of BEER TENTS 2 tile
+// festivalType3  // set up of BARS 1 tile
+// festivalType4  // set up of BARS 2 tile
+// festivalType5  // set up of STAGE tile
+// festivalType6  // set up of CHILL ZONE tile
+// festivalType7  // set up of REFRESHMENT tile
+// festivalType8  // set up of FOREST TOILET tile
+// festivalType9  // set up of TOI TOI tile
+// festivalType10 // set up of EPIC TOILET tile
+let festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 7, 8, 8, 9, 9, 9, 10, 10];
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 1);
@@ -32,42 +43,62 @@ function setup() {
 function draw() {
   background(50);
   drawBoard(BOARD_TILES);
+
+  showScoreDeskAndButtons();
+}
+
+function showScoreDeskAndButtons() {
   playerBtn1.draw_Button();
   playerBtn2.draw_Button();
   festivalBtn1.draw_Button();
   festivalBtn2.draw_Button();
   player.drawPlayerScore();
+
   drawPilePlayer();
   drawPileFestival();
 }
 
 function mousePressed() {
-  if (playerBtn1.click_Button(mouseX, mouseY)) {
-    buildID = playerBtn1.id;
-    removePlayerBtn = 1;
+  if (playerBtnEnable) {
+    if (playerBtn1.click_Button(mouseX, mouseY)) {
+      buildID = playerBtn1.id;
+      removePlayerBtn = 1;
+      boardEnable = true;
+    }
+
+    if (playerBtn2.click_Button(mouseX, mouseY)) {
+      buildID = playerBtn2.id;
+      removePlayerBtn = 2;
+      boardEnable = true;
+    }
+  }
+
+  if (festivalBtn1.click_Button(mouseX, mouseY)) {
+    buildFestID = festivalBtn1.id;
+    removeFestBtn = 1;
     boardEnable = true;
   }
 
-  if (playerBtn2.click_Button(mouseX, mouseY)) {
-    buildID = playerBtn2.id;
-    removePlayerBtn = 2;
+  if (festivalBtn2.click_Button(mouseX, mouseY)) {
+    buildFestID = festivalBtn2.id;
+    removeFestBtn = 2;
     boardEnable = true;
   }
 
   if (boardEnable) {
-    // console.log("bID " + buildID + " | score: " + player.score);
-
     for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
       for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
         if (arrTiles[indexI][indexJ].click_Tile(mouseX, mouseY)) {
           if (buildID == 0) {
+            playerBtnEnable = false;
             arrTiles[indexI][indexJ].setTypes(0, 0);
             arrTiles[indexI][indexJ].draw_Tile();
-            checkWhichBtnRemove(removePlayerBtn);
+            checkWhichPlayerBtnRemove(removePlayerBtn);
           } else if (buildID == 1) {
+            playerBtnEnable = false;
             arrTiles[indexI][indexJ].setTypes(0, 1);
             arrTiles[indexI][indexJ].draw_Tile();
-            checkWhichBtnRemove(removePlayerBtn);
+            checkWhichPlayerBtnRemove(removePlayerBtn);
             // let house = {
             //   posX: indexI,
             //   posY: indexJ,
@@ -75,9 +106,10 @@ function mousePressed() {
             // };
             // httpPost("/insertHouse", "json", house, (resposta) => {});
           } else if (buildID == 2) {
+            playerBtnEnable = false;
             arrTiles[indexI][indexJ].setTypes(0, 2);
             arrTiles[indexI][indexJ].draw_Tile();
-            checkWhichBtnRemove(removePlayerBtn);
+            checkWhichPlayerBtnRemove(removePlayerBtn);
             // let farm = {
             //   posX: indexI,
             //   posY: indexJ,
@@ -85,9 +117,67 @@ function mousePressed() {
             // };
             // httpPost("/insertFarm", "json", farm, (resposta) => {});
           }
+          switch (buildFestID) {
+            case 0:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 0);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 1:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 1);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 2:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 2);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 3:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 3);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 4:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 4);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 5:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 5);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 6:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 6);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 7:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 7);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 8:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 8);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+            case 9:
+              playerBtnEnable = true;
+              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 9);
+              checkWhichFestBtnRemove(removeFestBtn);
+              break;
+          }
+
           boardEnable = false;
+          buildID = undefined;
+          buildFestID = undefined;
+
           selectRandomPlayerTileTypeFromPile(playerBtn1);
           selectRandomPlayerTileTypeFromPile(playerBtn2);
+          selectRandomFestivalTileType(festivalBtn1);
+          selectRandomFestivalTileType(festivalBtn2);
         }
       }
     }
@@ -110,113 +200,62 @@ function setPileStatus() {
   selectRandomFestivalTileType(festivalBtn1);
   selectRandomFestivalTileType(festivalBtn2);
 }
-// -----------------------------------------------------
-// -----------------------------------------------------
-// -----------------------------------------------------
-// -----------------------------------------------------
-// -----------------------------------------------------
+
 function selectRandomPlayerTileTypeFromPile(playerBtn) {
   if (playerBtn.id == undefined && playerType.length > 0) {
     const random = Math.floor(Math.random() * playerType.length);
 
-    if (playerType[random] == 1) {
-      playerType.splice(random, 1);
-      playerBtn.setBtnType(0);
-    } else if (playerType[random] == 2) {
-      playerType.splice(random, 1);
-      playerBtn.setBtnType(1);
-    } else if (playerType[random] == 3) {
-      playerType.splice(random, 1);
-      playerBtn.setBtnType(2);
+    switch (playerType[random]) {
+      case 1:
+        spliceAndSetBtnType(playerType, playerBtn, random);
+        break;
+      case 2:
+        spliceAndSetBtnType(playerType, playerBtn, random);
+        break;
+      case 3:
+        spliceAndSetBtnType(playerType, playerBtn, random);
+        break;
     }
   }
 }
 
 function selectRandomFestivalTileType(festivalBtn) {
-  const random = Math.floor(Math.random() * 10);
+  if (festivalBtn.id == undefined && festivalType.length > 0) {
+    const random = Math.floor(Math.random() * festivalType.length);
 
-  if (festivalBtn.id == undefined) {
-    if (random == 0 && festivalType1 > 0) {
-      festivalType1--;
-      festivalBtn.setBtnType(0);
-    }
-    if (random == 1 && festivalType2 > 0) {
-      festivalType2--;
-      festivalBtn.setBtnType(1);
-    }
-    if (random == 2 && festivalType3 > 0) {
-      festivalType3--;
-      festivalBtn.setBtnType(2);
-    }
-    if (random == 3 && festivalType4 > 0) {
-      festivalType4--;
-      festivalBtn.setBtnType(3);
-    }
-    if (random == 4 && festivalType5 > 0) {
-      festivalType5--;
-      festivalBtn.setBtnType(4);
-    }
-    if (random == 5 && festivalType6 > 0) {
-      festivalType6--;
-      festivalBtn.setBtnType(5);
-    }
-    if (random == 6 && festivalType7 > 0) {
-      festivalType7--;
-      festivalBtn.setBtnType(6);
-    }
-    if (random == 7 && festivalType8 > 0) {
-      festivalType8--;
-      festivalBtn.setBtnType(7);
-    }
-    if (random == 8 && festivalType9 > 0) {
-      festivalType9--;
-      festivalBtn.setBtnType(8);
-    }
-    if (random == 9 && festivalType10 > 0) {
-      festivalType10--;
-      festivalBtn.setBtnType(9);
+    switch (festivalType[random]) {
+      case 1:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 2:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 3:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 4:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 5:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 6:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 7:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 8:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 9:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
+      case 10:
+        spliceAndSetBtnType(festivalType, festivalBtn, random);
+        break;
     }
   }
-}
-
-function drawPilePlayer() {
-  push();
-  fill("#888");
-  stroke("#000");
-  square(BOARD_TILES + (3 + BOARD_TILES) * 50, 30, 30, 10);
-  square(BOARD_TILES + (3 + BOARD_TILES) * 50 + 2, 30 + 2, 30, 10);
-  square(BOARD_TILES + (3 + BOARD_TILES) * 50 + 4, 30 + 4, 30, 10);
-  noStroke();
-  fill("#fff");
-
-  text(playerType.length, BOARD_TILES + (3 + BOARD_TILES) * 50 + 16, 53);
-  pop();
-}
-
-function drawPileFestival() {
-  push();
-  fill("#888");
-  stroke("#000");
-  square(BOARD_TILES + (3 + BOARD_TILES) * 50, windowHeight / 2 - 20, 30, 10);
-  square(BOARD_TILES + (3 + BOARD_TILES) * 50 + 2, windowHeight / 2 - 18, 30, 10);
-  square(BOARD_TILES + (3 + BOARD_TILES) * 50 + 4, windowHeight / 2 - 16, 30, 10);
-  noStroke();
-  fill("#fff");
-  text(
-    festivalType1 +
-      festivalType2 +
-      festivalType3 +
-      festivalType4 +
-      festivalType5 +
-      festivalType6 +
-      festivalType7 +
-      festivalType8 +
-      festivalType9 +
-      festivalType10,
-    BOARD_TILES + (3 + BOARD_TILES) * 50 + 13,
-    windowHeight / 2 + 2
-  );
-  pop();
 }
 
 // function draw() {
@@ -234,7 +273,8 @@ function drawPileFestival() {
 //   drawBoard(BOARD_TILES);
 // }
 
-// helpers
+// -----------------
+// HELPERS FUNCTIONS
 function constructBoard(numberOfTiles) {
   for (let i = 0; i < numberOfTiles; i++) {
     arrTiles[i] = [];
@@ -252,10 +292,28 @@ function drawBoard(numberOfTiles) {
   }
 }
 
-function checkWhichBtnRemove(removePlayerBtn) {
-  if (removePlayerBtn == 1) {
+function checkWhichPlayerBtnRemove(num) {
+  if (num == 1) {
     playerBtn1.setBtnType(undefined);
-  } else if (removePlayerBtn == 2) {
+  } else if (num == 2) {
     playerBtn2.setBtnType(undefined);
   }
+}
+
+function checkWhichFestBtnRemove(num) {
+  if (num == 1) {
+    festivalBtn1.setBtnType(undefined);
+  } else if (num == 2) {
+    festivalBtn2.setBtnType(undefined);
+  }
+}
+
+function setTypePlusDraw(tile, typeBtn, typeNum) {
+  tile.setTypes(typeBtn, typeNum);
+  tile.draw_Tile();
+}
+
+function spliceAndSetBtnType(arr, btn, indexNum) {
+  btn.setBtnType(arr[indexNum] - 1);
+  arr.splice(indexNum, 1);
 }

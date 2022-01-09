@@ -55,6 +55,41 @@ class Tile {
       }
     }
     if (this.type == 1) {
+      switch (this.typeNum) {
+        case 0:
+          this.color = "#fff";
+          break;
+        case 1:
+          this.color = "#f2faff";
+          break;
+        case 2:
+          this.color = "#e1f3ff";
+          break;
+        case 3:
+          this.color = "#d0ecff";
+          break;
+        case 4:
+          this.color = "#bfe6ff";
+          break;
+        case 5:
+          this.color = "#7bcbff";
+          break;
+        case 6:
+          this.color = "#59beff";
+          break;
+        case 7:
+          this.color = "#37b0ff";
+          break;
+        case 8:
+          this.color = "#15a3ff";
+          break;
+        case 9:
+          this.color = "#0093f2";
+          break;
+        case undefined:
+          this.color = "rgba(0,255,0, 1)";
+          break;
+      }
     }
   }
 }

@@ -5,10 +5,8 @@ potom tam je broadcast ale ten je len pre ostatnych clientov
 
 - Tile.js pridal som nejake setupy na na TYP ci tam je uz nieco polozene na tom policku
 type = festival/player
-typenum = ktore / mozno uz rovno dat percentualne + alebo - ale asi nie kedze potrebujem aj kontrolovat potom prilozene nove policka a nasobit vsetko
-od toho budem menit aj farbu policka musí sa zhodovať s Pile
+typenum = ktore / mozno uz rovno dat percentualne 
++ mozno skore a ak nie tak v Playerovi riesit skore
 
-
-// selectRandomPlayerTileTypeFromPile 
--## musi ist do databazy lebo ked pikujem nahodne nekedy je už ta picovina prazdna asi to musim zmeniť na pole alebo nejako inak vymysleť
--uz to mam - to iste mi treba v tej druhej picovine
+switch (buildFestID) {
+    tu musím ešte overiť či je možnosť položiť aj druhu festivalTile ak ano ešte neresetuj place nechaj ho prazdny
