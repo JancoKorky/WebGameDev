@@ -8,6 +8,7 @@ class Tile {
     this.color = "rgba(0,255,0, 1)";
     this.type = undefined;
     this.typeNum = undefined;
+    this.tileEnable = false;
   }
 
   setTypes(type, typeNum) {
@@ -18,7 +19,9 @@ class Tile {
 
   draw_Tile() {
     push();
-    fill(this.color);
+    if (this.tileEnable && this.type == undefined) {
+      fill("rgba(0,255,0, 0.3)");
+    } else fill(this.color);
     noStroke();
     square(this.posX, this.poxY, this.tileWidth, 5);
     pop();

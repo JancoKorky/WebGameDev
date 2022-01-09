@@ -10,3 +10,4 @@ typenum = ktore / mozno uz rovno dat percentualne
 
 switch (buildFestID) {
     tu musím ešte overiť či je možnosť položiť aj druhu festivalTile ak ano ešte neresetuj place nechaj ho prazdny
+    playerBtnEnable = true

@@ -30,7 +30,7 @@ let playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
 // festivalType8  // set up of FOREST TOILET tile
 // festivalType9  // set up of TOI TOI tile
 // festivalType10 // set up of EPIC TOILET tile
-let festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 6, 7, 8, 8, 9, 9, 9, 10, 10];
+let festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10];
 
 function setup() {
   createCanvas(windowWidth, windowHeight - 1);
@@ -45,6 +45,51 @@ function draw() {
   drawBoard(BOARD_TILES);
 
   showScoreDeskAndButtons();
+}
+
+function posibleFestivalTile() {
+  for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
+    for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
+      if (arrTiles[indexI][indexJ].type == 0) {
+        // -x -y
+        if (arrTiles[indexI - 1][indexJ - 1].type == 0) {
+          if (arrTiles[indexI][indexJ - 1].type == undefined) {
+            arrTiles[indexI][indexJ - 1].tileEnable = true;
+          }
+          if (arrTiles[indexI - 1][indexJ].type == undefined) {
+            arrTiles[indexI - 1][indexJ].tileEnable = true;
+          }
+        }
+        // -x +y
+        if (arrTiles[indexI - 1][indexJ + 1].type == 0) {
+          if (arrTiles[indexI - 1][indexJ].type == undefined) {
+            arrTiles[indexI - 1][indexJ].tileEnable = true;
+          }
+          if (arrTiles[indexI][indexJ + 1].type == undefined) {
+            arrTiles[indexI][indexJ + 1].tileEnable = true;
+          }
+        }
+        // +x -y
+        if (arrTiles[indexI + 1][indexJ - 1].type == 0) {
+          if (arrTiles[indexI][indexJ - 1].type == undefined) {
+            arrTiles[indexI][indexJ - 1].tileEnable = true;
+          }
+          if (arrTiles[indexI + 1][indexJ].type == undefined) {
+            arrTiles[indexI + 1][indexJ].tileEnable = true;
+          }
+        }
+        // +x +y
+        if (arrTiles[indexI + 1][indexJ + 1].type == 0) {
+          if (arrTiles[indexI + 1][indexJ].type == undefined) {
+            arrTiles[indexI + 1][indexJ].tileEnable = true;
+          }
+          if (arrTiles[indexI][indexJ + 1].type == undefined) {
+            arrTiles[indexI][indexJ + 1].tileEnable = true;
+          }
+        }
+      }
+    }
+  }
 }
 
 function showScoreDeskAndButtons() {
@@ -64,12 +109,14 @@ function mousePressed() {
       buildID = playerBtn1.id;
       removePlayerBtn = 1;
       boardEnable = true;
+      posibleHeadbangerTile();
     }
 
     if (playerBtn2.click_Button(mouseX, mouseY)) {
       buildID = playerBtn2.id;
       removePlayerBtn = 2;
       boardEnable = true;
+      posibleHeadbangerTile();
     }
   }
 
@@ -89,13 +136,11 @@ function mousePressed() {
     for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
       for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
         if (arrTiles[indexI][indexJ].click_Tile(mouseX, mouseY)) {
-          if (buildID == 0) {
-            playerBtnEnable = false;
+          if (buildID == 0 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 0);
             arrTiles[indexI][indexJ].draw_Tile();
             checkWhichPlayerBtnRemove(removePlayerBtn);
-          } else if (buildID == 1) {
-            playerBtnEnable = false;
+          } else if (buildID == 1 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 1);
             arrTiles[indexI][indexJ].draw_Tile();
             checkWhichPlayerBtnRemove(removePlayerBtn);
@@ -105,8 +150,7 @@ function mousePressed() {
             //   userID: userID,
             // };
             // httpPost("/insertHouse", "json", house, (resposta) => {});
-          } else if (buildID == 2) {
-            playerBtnEnable = false;
+          } else if (buildID == 2 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 2);
             arrTiles[indexI][indexJ].draw_Tile();
             checkWhichPlayerBtnRemove(removePlayerBtn);
@@ -119,60 +163,69 @@ function mousePressed() {
           }
           switch (buildFestID) {
             case 0:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 0);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 0);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 1:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 1);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 1);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 2:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 2);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 2);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 3:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 3);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 3);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 4:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 4);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 4);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 5:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 5);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 5);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 6:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 6);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 6);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 7:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 7);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 7);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 8:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 8);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 8);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
             case 9:
-              playerBtnEnable = true;
-              setTypePlusDraw(arrTiles[indexI][indexJ], 1, 9);
-              checkWhichFestBtnRemove(removeFestBtn);
+              if (arrTiles[indexI][indexJ].tileEnable) {
+                setTypePlusDraw(arrTiles[indexI][indexJ], 1, 9);
+                checkWhichFestBtnRemove(removeFestBtn);
+              }
               break;
           }
 
-          boardEnable = false;
-          buildID = undefined;
-          buildFestID = undefined;
+          // boardEnable = false;
+          // buildFestID = undefined;
 
           selectRandomPlayerTileTypeFromPile(playerBtn1);
           selectRandomPlayerTileTypeFromPile(playerBtn2);
@@ -282,6 +335,15 @@ function constructBoard(numberOfTiles) {
       arrTiles[i][j] = new Tile(i + i * 50, j + j * 50, i, j, 50);
     }
   }
+  // set starting tiles
+  let center = numberOfTiles / 2;
+  center = Math.floor(center);
+  if (numberOfTiles % 2 == 0) {
+    center--;
+  }
+
+  arrTiles[center][center].setTypes(1, 5);
+  arrTiles[center + 1][center + 1].setTypes(1, 8);
 }
 
 function drawBoard(numberOfTiles) {
@@ -298,6 +360,11 @@ function checkWhichPlayerBtnRemove(num) {
   } else if (num == 2) {
     playerBtn2.setBtnType(undefined);
   }
+  // playerBtnEnable = false;
+  boardEnable = false;
+  buildID = undefined;
+  resetHeadbangerTile();
+  posibleFestivalTile();
 }
 
 function checkWhichFestBtnRemove(num) {
@@ -306,6 +373,8 @@ function checkWhichFestBtnRemove(num) {
   } else if (num == 2) {
     festivalBtn2.setBtnType(undefined);
   }
+  boardEnable = false;
+  buildFestID = undefined;
 }
 
 function setTypePlusDraw(tile, typeBtn, typeNum) {
@@ -316,4 +385,35 @@ function setTypePlusDraw(tile, typeBtn, typeNum) {
 function spliceAndSetBtnType(arr, btn, indexNum) {
   btn.setBtnType(arr[indexNum] - 1);
   arr.splice(indexNum, 1);
+}
+
+// reset showing possibility to place HeadBanger tile
+function resetHeadbangerTile() {
+  for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
+    for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
+      arrTiles[indexI][indexJ].tileEnable = false;
+    }
+  }
+}
+
+// shows you, where you can put your HeadBanger tile
+function posibleHeadbangerTile() {
+  for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
+    for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
+      if (arrTiles[indexI][indexJ].type == 1) {
+        if (arrTiles[indexI - 1][indexJ].type == undefined) {
+          arrTiles[indexI - 1][indexJ].tileEnable = true;
+        }
+        if (arrTiles[indexI + 1][indexJ].type == undefined) {
+          arrTiles[indexI + 1][indexJ].tileEnable = true;
+        }
+        if (arrTiles[indexI][indexJ - 1].type == undefined) {
+          arrTiles[indexI][indexJ - 1].tileEnable = true;
+        }
+        if (arrTiles[indexI][indexJ + 1].type == undefined) {
+          arrTiles[indexI][indexJ + 1].tileEnable = true;
+        }
+      }
+    }
+  }
 }
