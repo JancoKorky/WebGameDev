@@ -8,6 +8,10 @@ type = festival/player
 typenum = ktore / mozno uz rovno dat percentualne 
 + mozno skore a ak nie tak v Playerovi riesit skore
 
-switch (buildFestID) {
-    tu musím ešte overiť či je možnosť položiť aj druhu festivalTile ak ano ešte neresetuj place nechaj ho prazdny
-    playerBtnEnable = true
+
+
+//switch (buildFestID) {
+//   tu musím ešte overiť či je možnosť položiť aj druhu festivalTile ak ano ešte neresetuj place nechaj ho prazdny
+//    playerBtnEnable = true
+
+countFestMove - ak nie je 0 tak - farbicky na aktivne kôpky

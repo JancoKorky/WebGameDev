@@ -1,3 +1,8 @@
+let mainScene = false;
+let userID = undefined;
+let userName = undefined;
+let userNewGame = undefined;
+let userPlayer = undefined;
 let arrTiles = [];
 const BOARD_TILES = 14;
 let boardEnable = false;
@@ -13,6 +18,8 @@ let playerBtn1 = undefined;
 let playerBtn2 = undefined;
 let festivalBtn1 = undefined;
 let festivalBtn2 = undefined;
+
+let countFestMove = 0;
 
 // THERE IS CONFIGURATION OF TILES
 // let playerType1 = 5; // 1-times plus points from  all tiles around
@@ -33,62 +40,131 @@ let playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
 let festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10];
 
 function setup() {
+  // socket = io.connect("http://localhost:3000");
   createCanvas(windowWidth, windowHeight - 1);
   constructBoard(BOARD_TILES);
 
   setPlayer1Status();
   setPileStatus();
+
+  usernameInput = createInput("UserName");
+  usernameInput.position(width / 2 - 75, height / 2 - 25);
+
+  passwordInput = createInput("Password");
+  passwordInput.position(width / 2 - 75, height / 2);
+
+  loginBTN = createButton("Login");
+  loginBTN.position(width / 2 - 75, height / 2 + 30);
+  loginBTN.mousePressed(doLogin);
 }
+
+function doLogin() {
+  usernameInput.remove();
+  passwordInput.remove();
+  loginBTN.remove();
+
+  let userData = {
+    username: usernameInput.value(),
+    password: passwordInput.value(),
+  };
+
+  httpPost("/login", "json", userData, (resultUser) => {
+    userID = resultUser.userID;
+    userName = resultUser.username;
+    userNewGame = resultUser.newgame;
+    console.log(userID);
+    // resetGame+Score?
+    // loadTilesPlaced();
+    if (userNewGame) {
+      // resetGameForPlayer(userID);
+      // send userNewGame switch to database !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      // post na reset score a policok playerType + festivalType musia byt naplnene, vsetky premenne reset?
+    }
+
+    loadDeck();
+
+    mainScene = true;
+  });
+}
+
+function resetGameForPlayer(userID) {
+  httpDo("/resetID", "PUT", "json", userID, () => {
+    playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
+    festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10];
+    userPlayer.score = 50;
+  });
+}
+
+function loadDeck() {
+  loadJSON("/getPlayerDeck/" + userID, (serverData) => {
+    playerType = [];
+    for (let index = 0; index < serverData.times_one; index++) {
+      playerType.push(1);
+    }
+    for (let index = 0; index < serverData.times_two; index++) {
+      playerType.push(2);
+    }
+    for (let index = 0; index < serverData.times_three; index++) {
+      playerType.push(3);
+    }
+  });
+
+  loadJSON("/getFestivalDeck/" + userID, (serverData) => {
+    festivalType = [];
+    console.log(festivalType);
+    for (let index = 0; index < serverData.beerTent; index++) {
+      festivalType.push(1);
+    }
+    for (let index = 0; index < serverData.beerTentStrong; index++) {
+      festivalType.push(2);
+    }
+    for (let index = 0; index < serverData.barStrong; index++) {
+      festivalType.push(3);
+    }
+    for (let index = 0; index < serverData.bar; index++) {
+      festivalType.push(4);
+    }
+    for (let index = 0; index < serverData.stage; index++) {
+      festivalType.push(5);
+    }
+    for (let index = 0; index < serverData.chillzone; index++) {
+      festivalType.push(6);
+    }
+    for (let index = 0; index < serverData.refreshment; index++) {
+      festivalType.push(7);
+    }
+    for (let index = 0; index < serverData.forestToi; index++) {
+      festivalType.push(8);
+    }
+    for (let index = 0; index < serverData.toitoi; index++) {
+      festivalType.push(9);
+    }
+    for (let index = 0; index < serverData.cleanToi; index++) {
+      festivalType.push(10);
+    }
+    console.log(festivalType);
+  });
+}
+
+// function loadTilesPlaced() {
+//   loadJSON("/get/" + userID, (dataDoServidor) => {
+//     if (dataDoServidor.length > 0) {
+//       housesReceived = dataDoServidor;
+//       for (let i = 0; i < housesReceived.length; i++) {
+//         arrTiles[housesReceived[i].posX][housesReceived[i].posY].clr = 0;
+//       }
+//     } else {
+//       alert("no houses");
+//     }
+//   });
+// }
 
 function draw() {
   background(50);
-  drawBoard(BOARD_TILES);
 
-  showScoreDeskAndButtons();
-}
-
-function posibleFestivalTile() {
-  for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
-    for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
-      if (arrTiles[indexI][indexJ].type == 0) {
-        // -x -y
-        if (arrTiles[indexI - 1][indexJ - 1].type == 0) {
-          if (arrTiles[indexI][indexJ - 1].type == undefined) {
-            arrTiles[indexI][indexJ - 1].tileEnable = true;
-          }
-          if (arrTiles[indexI - 1][indexJ].type == undefined) {
-            arrTiles[indexI - 1][indexJ].tileEnable = true;
-          }
-        }
-        // -x +y
-        if (arrTiles[indexI - 1][indexJ + 1].type == 0) {
-          if (arrTiles[indexI - 1][indexJ].type == undefined) {
-            arrTiles[indexI - 1][indexJ].tileEnable = true;
-          }
-          if (arrTiles[indexI][indexJ + 1].type == undefined) {
-            arrTiles[indexI][indexJ + 1].tileEnable = true;
-          }
-        }
-        // +x -y
-        if (arrTiles[indexI + 1][indexJ - 1].type == 0) {
-          if (arrTiles[indexI][indexJ - 1].type == undefined) {
-            arrTiles[indexI][indexJ - 1].tileEnable = true;
-          }
-          if (arrTiles[indexI + 1][indexJ].type == undefined) {
-            arrTiles[indexI + 1][indexJ].tileEnable = true;
-          }
-        }
-        // +x +y
-        if (arrTiles[indexI + 1][indexJ + 1].type == 0) {
-          if (arrTiles[indexI + 1][indexJ].type == undefined) {
-            arrTiles[indexI + 1][indexJ].tileEnable = true;
-          }
-          if (arrTiles[indexI][indexJ + 1].type == undefined) {
-            arrTiles[indexI][indexJ + 1].tileEnable = true;
-          }
-        }
-      }
-    }
+  if (mainScene) {
+    drawBoard(BOARD_TILES);
+    showScoreDeskAndButtons();
   }
 }
 
@@ -97,7 +173,7 @@ function showScoreDeskAndButtons() {
   playerBtn2.draw_Button();
   festivalBtn1.draw_Button();
   festivalBtn2.draw_Button();
-  player.drawPlayerScore();
+  userPlayer.drawPlayerScore();
 
   drawPilePlayer();
   drawPileFestival();
@@ -105,14 +181,14 @@ function showScoreDeskAndButtons() {
 
 function mousePressed() {
   if (playerBtnEnable) {
-    if (playerBtn1.click_Button(mouseX, mouseY)) {
+    if (playerBtn1.click_Button(mouseX, mouseY) && countFestMove == 0) {
       buildID = playerBtn1.id;
       removePlayerBtn = 1;
       boardEnable = true;
       posibleHeadbangerTile();
     }
 
-    if (playerBtn2.click_Button(mouseX, mouseY)) {
+    if (playerBtn2.click_Button(mouseX, mouseY) && countFestMove == 0) {
       buildID = playerBtn2.id;
       removePlayerBtn = 2;
       boardEnable = true;
@@ -166,64 +242,74 @@ function mousePressed() {
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 0);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 1:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 1);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 2:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 2);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 3:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 3);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 4:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 4);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 5:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 5);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 6:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 6);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 7:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 7);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 8:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 8);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
             case 9:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 9);
                 checkWhichFestBtnRemove(removeFestBtn);
+                countFestMove--;
               }
               break;
           }
-
+          // console.log(countFestMove);
           // boardEnable = false;
           // buildFestID = undefined;
 
@@ -240,7 +326,7 @@ function mousePressed() {
 function setPlayer1Status() {
   playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
   playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
-  player = new Player("Jožko", BOARD_TILES + (1 + BOARD_TILES) * 50, 130);
+  userPlayer = new Player("Jožko", BOARD_TILES + (1 + BOARD_TILES) * 50, 130);
   // tu som skoncil s geterom seterom potrebujem urobit zmenu score na zaklade niecoho, a rozchodit buttony -tu to asi bude vsetka logika
   selectRandomPlayerTileTypeFromPile(playerBtn1);
   selectRandomPlayerTileTypeFromPile(playerBtn2);
@@ -363,7 +449,7 @@ function checkWhichPlayerBtnRemove(num) {
   // playerBtnEnable = false;
   boardEnable = false;
   buildID = undefined;
-  resetHeadbangerTile();
+  resetPossibleTile();
   posibleFestivalTile();
 }
 
@@ -387,8 +473,8 @@ function spliceAndSetBtnType(arr, btn, indexNum) {
   arr.splice(indexNum, 1);
 }
 
-// reset showing possibility to place HeadBanger tile
-function resetHeadbangerTile() {
+// reset showing possibility to place HeadBanger or Festival tile
+function resetPossibleTile() {
   for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
     for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
       arrTiles[indexI][indexJ].tileEnable = false;
@@ -412,6 +498,59 @@ function posibleHeadbangerTile() {
         }
         if (arrTiles[indexI][indexJ + 1].type == undefined) {
           arrTiles[indexI][indexJ + 1].tileEnable = true;
+        }
+      }
+    }
+  }
+}
+
+// shows you, where you can put your Festival tile
+function posibleFestivalTile() {
+  for (let indexI = 0; indexI < BOARD_TILES; indexI++) {
+    for (let indexJ = 0; indexJ < BOARD_TILES; indexJ++) {
+      if (arrTiles[indexI][indexJ].type == 0) {
+        if (arrTiles[indexI - 1][indexJ - 1].type == 0) {
+          if (arrTiles[indexI][indexJ - 1].type == undefined) {
+            arrTiles[indexI][indexJ - 1].tileEnable = true;
+            countFestMove += 0.5;
+          }
+          if (arrTiles[indexI - 1][indexJ].type == undefined) {
+            arrTiles[indexI - 1][indexJ].tileEnable = true;
+            countFestMove += 0.5;
+          }
+        }
+
+        if (arrTiles[indexI - 1][indexJ + 1].type == 0) {
+          if (arrTiles[indexI - 1][indexJ].type == undefined) {
+            arrTiles[indexI - 1][indexJ].tileEnable = true;
+            countFestMove += 0.5;
+          }
+          if (arrTiles[indexI][indexJ + 1].type == undefined) {
+            arrTiles[indexI][indexJ + 1].tileEnable = true;
+            countFestMove += 0.5;
+          }
+        }
+
+        if (arrTiles[indexI + 1][indexJ - 1].type == 0) {
+          if (arrTiles[indexI][indexJ - 1].type == undefined) {
+            arrTiles[indexI][indexJ - 1].tileEnable = true;
+            countFestMove += 0.5;
+          }
+          if (arrTiles[indexI + 1][indexJ].type == undefined) {
+            arrTiles[indexI + 1][indexJ].tileEnable = true;
+            countFestMove += 0.5;
+          }
+        }
+
+        if (arrTiles[indexI + 1][indexJ + 1].type == 0) {
+          if (arrTiles[indexI + 1][indexJ].type == undefined) {
+            arrTiles[indexI + 1][indexJ].tileEnable = true;
+            countFestMove += 0.5;
+          }
+          if (arrTiles[indexI][indexJ + 1].type == undefined) {
+            arrTiles[indexI][indexJ + 1].tileEnable = true;
+            countFestMove += 0.5;
+          }
         }
       }
     }

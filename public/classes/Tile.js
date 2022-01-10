@@ -5,7 +5,7 @@ class Tile {
     this.indexI = indexI;
     this.indexJ = indexJ;
     this.tileWidth = tileWidth;
-    this.color = "rgba(0,255,0, 1)";
+    this.color = "rgba(0,255,0, 0)";
     this.type = undefined;
     this.typeNum = undefined;
     this.tileEnable = false;
