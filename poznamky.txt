@@ -1,28 +1,14 @@
--- socket mozem emitovat pri tom ako nieco menim v databaze, bude vhodne asi overit ci je zmena v databaze ci nepadol error a az tak emitovat
-- kedze budem asi mat ten mysql2 pool tak to netreba asi riesit priamo z .then mozem poslat emit
-potom tam je broadcast ale ten je len pre ostatnych clientov
+//-- socket mozem emitovat pri tom ako nieco menim v databaze, bude vhodne asi overit ci je zmena v databaze ci nepadol error a az tak emitovat
+//- kedze budem asi mat ten mysql2 pool tak to netreba asi riesit priamo z .then mozem poslat emit
+//potom tam je broadcast ale ten je len pre ostatnych clientov
 
 
-- Tile.js pridal som nejake setupy na na TYP ci tam je uz nieco polozene na tom policku
-type = festival/player
-typenum = ktore / mozno uz rovno dat percentualne 
-+ mozno skore a ak nie tak v Playerovi riesit skore
+info    countFestMove - ak nie je 0 tak - farbicky na aktivne kôpky
 
 
+OK      potrebujem pockat pre polozenie druhej festival tile
+nok     potrebujem update na score - potrebuje to opravit pri polozeni festivalTile -> ten by mal pocitat skore druhým hracom
+            checkScoreForPlacedPlayerTile
+OK      potrebujem save na board
 
-//switch (buildFestID) {
-//   tu musím ešte overiť či je možnosť položiť aj druhu festivalTile ak ano ešte neresetuj place nechaj ho prazdny
-//    playerBtnEnable = true
-
-countFestMove - ak nie je 0 tak - farbicky na aktivne kôpky
-
-
-
-
-OK  potrebujem pockat pre polozenie druhej festival tile
-nok potrebujem update na score - potrebuje to opravit pri polozeni festivalTile -> ten by mal pocitat skore druhým hracom
-        checkScoreForPlacedPlayerTile
-
-    potrebujem save na board
-    potrebujem obrazky
-a asi jebem na to
+-       potrebujem obrazky

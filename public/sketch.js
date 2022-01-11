@@ -289,7 +289,6 @@ function mousePressed() {
       removePlayerBtn = 1;
       boardEnable = true;
       posibleHeadbangerTile();
-      // resetGameForPlayerID()
     }
 
     if (playerBtn2.click_Button(mouseX, mouseY) && countFestMove == 0) {
@@ -340,7 +339,6 @@ function mousePressed() {
             };
             httpPost("/postBoard/" + userID, "json", posForScore);
             checkWhichPlayerBtnRemove(removePlayerBtn);
-            // httpPost posForScore insert2
           } else if (buildID == 2 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 2);
             arrTiles[indexI][indexJ].draw_Tile();
@@ -353,7 +351,6 @@ function mousePressed() {
             };
             httpPost("/postBoard/" + userID, "json", posForScore);
             checkWhichPlayerBtnRemove(removePlayerBtn);
-            // httpPost posForScore insert3
           }
           // -------------------
           // for festival button
@@ -526,7 +523,7 @@ function setPlayer1Status() {
   playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
   playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
   userPlayer = new Player("", BOARD_TILES + (1 + BOARD_TILES) * 50, 130);
-  // tu som skoncil s geterom seterom potrebujem urobit zmenu score na zaklade niecoho, a rozchodit buttony -tu to asi bude vsetka logika
+  
   selectRandomPlayerTileTypeFromPile(playerBtn1);
   selectRandomPlayerTileTypeFromPile(playerBtn2);
 }
@@ -595,21 +592,6 @@ function selectRandomFestivalTileType(festivalBtn) {
     }
   }
 }
-
-// function draw() {
-//   background("#232e47");
-
-//   if (firstScene) {
-//     mainScene();
-//   }
-// }
-
-// function mainScene() {
-//   background("#232e47");
-//   playerBtn1.draw_Button();
-//   playerBtn2.draw_Button();
-//   drawBoard(BOARD_TILES);
-// }
 
 // -----------------
 // HELPERS FUNCTIONS
@@ -758,8 +740,6 @@ function posibleFestivalTile() {
 }
 
 function checkScoreForPlacedPlayerTile(position) {
-  // console.log(position);
-
   let tilesScore = 0;
 
   const tilesPoints = [
@@ -768,14 +748,13 @@ function checkScoreForPlacedPlayerTile(position) {
     arrTiles[position.posX + 1][position.posY].points,
     arrTiles[position.posX][position.posY + 1].points,
   ];
-  // console.log(tilesPoints);
 
   tilesPoints.forEach((tile) => {
     if (tile != undefined) {
       tilesScore += tile * (position.buildID + 1);
     }
   });
-  // console.log(tilesScore);
+  
   return tilesScore;
 }
 
