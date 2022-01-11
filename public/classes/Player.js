@@ -9,7 +9,7 @@ class Player {
 
   drawPlayerScore() {
     push();
-    textSize(20);
+    textSize(15);
     fill(255);
     noStroke();
     text(this.name + " score: " + this.score, this.posX, this.posY);

@@ -80,7 +80,6 @@ exports.getPlayerDeck = (req, res, next) => {
     });
 };
 
-
 exports.getFestivalDeck = (req, res, next) => {
   const userID = req.params.userID;
 
@@ -89,6 +88,27 @@ exports.getFestivalDeck = (req, res, next) => {
     .then((result) => {
       const [newResult] = result[0];
       res.json(newResult);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+exports.resetID = (req, res, next) => {
+  const userID = req.params.userID;
+
+  dbase
+    .execute("UPDATE user SET score=50, newgame=FALSE WHERE userID=" + userID)
+    .then((result) => {
+      dbase
+        .execute("SELECT * FROM user WHERE userID='" + userID + "'")
+        .then((result) => {
+          const [newResult] = result[0];
+          res.json(newResult);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     })
     .catch((err) => {
       console.log(err);

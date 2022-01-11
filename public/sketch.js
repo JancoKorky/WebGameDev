@@ -18,6 +18,8 @@ let playerBtn1 = undefined;
 let playerBtn2 = undefined;
 let festivalBtn1 = undefined;
 let festivalBtn2 = undefined;
+let selectedPlayer = undefined;
+let selectedFest = undefined;
 
 let countFestMove = 0;
 
@@ -25,7 +27,7 @@ let countFestMove = 0;
 // let playerType1 = 5; // 1-times plus points from  all tiles around
 // let playerType2 = 3; // 2-times plus points from  all tiles around
 // let playerType3 = 2; // 3-times plus points from  all tiles around
-let playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
+let playerType = [];
 
 // festivalType1  // set up of BEER TENTS 1 tile
 // festivalType2  // set up of BEER TENTS 2 tile
@@ -37,15 +39,15 @@ let playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
 // festivalType8  // set up of FOREST TOILET tile
 // festivalType9  // set up of TOI TOI tile
 // festivalType10 // set up of EPIC TOILET tile
-let festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10];
+let festivalType = [];
+
+// playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
+//   playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
 
 function setup() {
   // socket = io.connect("http://localhost:3000");
   createCanvas(windowWidth, windowHeight - 1);
   constructBoard(BOARD_TILES);
-
-  setPlayer1Status();
-  setPileStatus();
 
   usernameInput = createInput("UserName");
   usernameInput.position(width / 2 - 75, height / 2 - 25);
@@ -56,6 +58,10 @@ function setup() {
   loginBTN = createButton("Login");
   loginBTN.position(width / 2 - 75, height / 2 + 30);
   loginBTN.mousePressed(doLogin);
+
+  setPlayer1Status();
+  setPileStatus();
+  setSelectedDecks();
 }
 
 function doLogin() {
@@ -69,16 +75,18 @@ function doLogin() {
   };
 
   httpPost("/login", "json", userData, (resultUser) => {
+    userPlayer.name = resultUser.username;
     userID = resultUser.userID;
     userName = resultUser.username;
     userNewGame = resultUser.newgame;
-    console.log(userID);
+    userPlayer.score = resultUser.score;
     // resetGame+Score?
     // loadTilesPlaced();
     if (userNewGame) {
-      // resetGameForPlayer(userID);
+      // resetGameForPlayerID(userID);
       // send userNewGame switch to database !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       // post na reset score a policok playerType + festivalType musia byt naplnene, vsetky premenne reset?
+      // TOTO POJDE ASI INDE A NIE DO LOGINU
     }
 
     loadDeck();
@@ -87,63 +95,192 @@ function doLogin() {
   });
 }
 
-function resetGameForPlayer(userID) {
-  httpDo("/resetID", "PUT", "json", userID, () => {
-    playerType = [1, 1, 1, 1, 1, 3, 3, 2, 2, 2];
-    festivalType = [1, 1, 1, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6, 7, 8, 8, 9, 9, 10, 10];
-    userPlayer.score = 50;
+function resetGameForPlayerID(userID) {
+  httpDo("/resetID/" + userID, "PUT", "json", undefined, (serverData) => {
+    console.log(serverData);
+    userNewGame = serverData.newgame;
+    userPlayer.score = serverData.score;
+
+    // resetDeck()
+    // resetBoard() arrTiles
   });
 }
 
-function loadDeck() {
-  loadJSON("/getPlayerDeck/" + userID, (serverData) => {
-    playerType = [];
-    for (let index = 0; index < serverData.times_one; index++) {
-      playerType.push(1);
-    }
-    for (let index = 0; index < serverData.times_two; index++) {
-      playerType.push(2);
-    }
-    for (let index = 0; index < serverData.times_three; index++) {
-      playerType.push(3);
-    }
-  });
+function updatePlayerDeck() {
+  let dataDeckUpdate = {
+    times_one: 0,
+    times_two: 0,
+    times_three: 0,
+  };
 
-  loadJSON("/getFestivalDeck/" + userID, (serverData) => {
-    festivalType = [];
-    console.log(festivalType);
-    for (let index = 0; index < serverData.beerTent; index++) {
-      festivalType.push(1);
+  for (let index = 0; index < playerType.length; index++) {
+    const element = playerType[index];
+
+    if (element == 1) {
+      dataDeckUpdate.times_one++;
+    } else if (element == 2) {
+      dataDeckUpdate.times_two++;
+    } else if (element == 3) {
+      dataDeckUpdate.times_three++;
     }
-    for (let index = 0; index < serverData.beerTentStrong; index++) {
-      festivalType.push(2);
+  }
+
+  if (playerBtn1.id == 0) {
+    dataDeckUpdate.times_one++;
+  } else if (playerBtn1.id == 1) {
+    dataDeckUpdate.times_two++;
+  } else if (playerBtn1.id == 2) {
+    dataDeckUpdate.times_three++;
+  }
+
+  if (playerBtn2.id == 0) {
+    dataDeckUpdate.times_one++;
+  } else if (playerBtn2.id == 1) {
+    dataDeckUpdate.times_two++;
+  } else if (playerBtn2.id == 2) {
+    dataDeckUpdate.times_three++;
+  }
+
+  httpPost("/updatePlayerDeck/" + userID, "json", dataDeckUpdate, (result) => {});
+}
+
+function updateFestivalDeck() {
+  let dataDeckUpdate = {
+    beerTent: 0,
+    beerTentStrong: 0,
+    barStrong: 0,
+    bar: 0,
+    stage: 0,
+    chillzone: 0,
+    refreshment: 0,
+    forestToi: 0,
+    toitoi: 0,
+    cleanToi: 0,
+  };
+
+  for (let index = 0; index < festivalType.length; index++) {
+    const element = festivalType[index];
+
+    if (element == 1) {
+      dataDeckUpdate.beerTent++;
+    } else if (element == 2) {
+      dataDeckUpdate.beerTentStrong++;
+    } else if (element == 3) {
+      dataDeckUpdate.barStrong++;
+    } else if (element == 4) {
+      dataDeckUpdate.bar++;
+    } else if (element == 5) {
+      dataDeckUpdate.stage++;
+    } else if (element == 6) {
+      dataDeckUpdate.chillzone++;
+    } else if (element == 7) {
+      dataDeckUpdate.refreshment++;
+    } else if (element == 8) {
+      dataDeckUpdate.forestToi++;
+    } else if (element == 9) {
+      dataDeckUpdate.toitoi++;
+    } else if (element == 10) {
+      dataDeckUpdate.cleanToi++;
     }
-    for (let index = 0; index < serverData.barStrong; index++) {
-      festivalType.push(3);
-    }
-    for (let index = 0; index < serverData.bar; index++) {
-      festivalType.push(4);
-    }
-    for (let index = 0; index < serverData.stage; index++) {
-      festivalType.push(5);
-    }
-    for (let index = 0; index < serverData.chillzone; index++) {
-      festivalType.push(6);
-    }
-    for (let index = 0; index < serverData.refreshment; index++) {
-      festivalType.push(7);
-    }
-    for (let index = 0; index < serverData.forestToi; index++) {
-      festivalType.push(8);
-    }
-    for (let index = 0; index < serverData.toitoi; index++) {
-      festivalType.push(9);
-    }
-    for (let index = 0; index < serverData.cleanToi; index++) {
-      festivalType.push(10);
-    }
-    console.log(festivalType);
-  });
+  }
+
+  if (festivalBtn1.id == 0) {
+    dataDeckUpdate.beerTent++;
+  } else if (festivalBtn1.id == 1) {
+    dataDeckUpdate.beerTentStrong++;
+  } else if (festivalBtn1.id == 2) {
+    dataDeckUpdate.barStrong++;
+  } else if (festivalBtn1.id == 3) {
+    dataDeckUpdate.bar++;
+  } else if (festivalBtn1.id == 4) {
+    dataDeckUpdate.stage++;
+  } else if (festivalBtn1.id == 5) {
+    dataDeckUpdate.chillzone++;
+  } else if (festivalBtn1.id == 6) {
+    dataDeckUpdate.refreshment++;
+  } else if (festivalBtn1.id == 7) {
+    dataDeckUpdate.forestToi++;
+  } else if (festivalBtn1.id == 8) {
+    dataDeckUpdate.toitoi++;
+  } else if (festivalBtn1.id == 9) {
+    dataDeckUpdate.cleanToi++;
+  }
+
+  if (festivalBtn2.id == 0) {
+    dataDeckUpdate.beerTent++;
+  } else if (festivalBtn2.id == 1) {
+    dataDeckUpdate.beerTentStrong++;
+  } else if (festivalBtn2.id == 2) {
+    dataDeckUpdate.barStrong++;
+  } else if (festivalBtn2.id == 3) {
+    dataDeckUpdate.bar++;
+  } else if (festivalBtn2.id == 4) {
+    dataDeckUpdate.stage++;
+  } else if (festivalBtn2.id == 5) {
+    dataDeckUpdate.chillzone++;
+  } else if (festivalBtn2.id == 6) {
+    dataDeckUpdate.refreshment++;
+  } else if (festivalBtn2.id == 7) {
+    dataDeckUpdate.forestToi++;
+  } else if (festivalBtn2.id == 8) {
+    dataDeckUpdate.toitoi++;
+  } else if (festivalBtn2.id == 9) {
+    dataDeckUpdate.cleanToi++;
+  }
+  httpPost("/updateFestivalDeck/" + userID, "json", dataDeckUpdate, (result) => {});
+}
+
+function loadDeck() {
+  loadJSON("/getPlayerDeck/" + userID, loadPlayerDeck);
+  loadJSON("/getFestivalDeck/" + userID, loadFestivalDeck);
+}
+
+function loadPlayerDeck(serverData) {
+  playerType = [];
+  for (let index = 0; index < serverData.times_one; index++) {
+    playerType.push(1);
+  }
+  for (let index = 0; index < serverData.times_two; index++) {
+    playerType.push(2);
+  }
+  for (let index = 0; index < serverData.times_three; index++) {
+    playerType.push(3);
+  }
+}
+
+function loadFestivalDeck(serverData) {
+  festivalType = [];
+
+  for (let index = 0; index < serverData.beerTent; index++) {
+    festivalType.push(1);
+  }
+  for (let index = 0; index < serverData.beerTentStrong; index++) {
+    festivalType.push(2);
+  }
+  for (let index = 0; index < serverData.barStrong; index++) {
+    festivalType.push(3);
+  }
+  for (let index = 0; index < serverData.bar; index++) {
+    festivalType.push(4);
+  }
+  for (let index = 0; index < serverData.stage; index++) {
+    festivalType.push(5);
+  }
+  for (let index = 0; index < serverData.chillzone; index++) {
+    festivalType.push(6);
+  }
+  for (let index = 0; index < serverData.refreshment; index++) {
+    festivalType.push(7);
+  }
+  for (let index = 0; index < serverData.forestToi; index++) {
+    festivalType.push(8);
+  }
+  for (let index = 0; index < serverData.toitoi; index++) {
+    festivalType.push(9);
+  }
+  for (let index = 0; index < serverData.cleanToi; index++) {
+    festivalType.push(10);
+  }
 }
 
 // function loadTilesPlaced() {
@@ -161,7 +298,6 @@ function loadDeck() {
 
 function draw() {
   background(50);
-
   if (mainScene) {
     drawBoard(BOARD_TILES);
     showScoreDeskAndButtons();
@@ -169,6 +305,11 @@ function draw() {
 }
 
 function showScoreDeskAndButtons() {
+  checkAsyncLoad();
+
+  if (playerBtnEnable) selectedPlayer.draw_Selected();
+  else selectedFest.draw_Selected();
+
   playerBtn1.draw_Button();
   playerBtn2.draw_Button();
   festivalBtn1.draw_Button();
@@ -186,6 +327,7 @@ function mousePressed() {
       removePlayerBtn = 1;
       boardEnable = true;
       posibleHeadbangerTile();
+      // resetGameForPlayerID()
     }
 
     if (playerBtn2.click_Button(mouseX, mouseY) && countFestMove == 0) {
@@ -312,11 +454,16 @@ function mousePressed() {
           // console.log(countFestMove);
           // boardEnable = false;
           // buildFestID = undefined;
+          if (!countFestMove) {
+            playerBtnEnable = true;
+          }
 
           selectRandomPlayerTileTypeFromPile(playerBtn1);
           selectRandomPlayerTileTypeFromPile(playerBtn2);
           selectRandomFestivalTileType(festivalBtn1);
           selectRandomFestivalTileType(festivalBtn2);
+          updatePlayerDeck();
+          updateFestivalDeck();
         }
       }
     }
@@ -326,10 +473,11 @@ function mousePressed() {
 function setPlayer1Status() {
   playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
   playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
-  userPlayer = new Player("Jožko", BOARD_TILES + (1 + BOARD_TILES) * 50, 130);
+  userPlayer = new Player("", BOARD_TILES + (1 + BOARD_TILES) * 50, 130);
   // tu som skoncil s geterom seterom potrebujem urobit zmenu score na zaklade niecoho, a rozchodit buttony -tu to asi bude vsetka logika
   selectRandomPlayerTileTypeFromPile(playerBtn1);
   selectRandomPlayerTileTypeFromPile(playerBtn2);
+  
 }
 
 function setPileStatus() {
@@ -342,6 +490,7 @@ function setPileStatus() {
 
 function selectRandomPlayerTileTypeFromPile(playerBtn) {
   if (playerBtn.id == undefined && playerType.length > 0) {
+    console.log("ptype ", playerType, " pbtn: ", playerBtn.id);
     const random = Math.floor(Math.random() * playerType.length);
 
     switch (playerType[random]) {
@@ -446,7 +595,7 @@ function checkWhichPlayerBtnRemove(num) {
   } else if (num == 2) {
     playerBtn2.setBtnType(undefined);
   }
-  // playerBtnEnable = false;
+  playerBtnEnable = false;
   boardEnable = false;
   buildID = undefined;
   resetPossibleTile();
@@ -470,6 +619,7 @@ function setTypePlusDraw(tile, typeBtn, typeNum) {
 
 function spliceAndSetBtnType(arr, btn, indexNum) {
   btn.setBtnType(arr[indexNum] - 1);
+  // sem pojde update
   arr.splice(indexNum, 1);
 }
 
@@ -555,4 +705,9 @@ function posibleFestivalTile() {
       }
     }
   }
+}
+
+function setSelectedDecks() {
+  selectedPlayer = new SelectedDeck(playerBtn1.posX - 25, playerBtn1.posY - 25, 125);
+  selectedFest = new SelectedDeck(festivalBtn1.posX - 25, festivalBtn1.posY - 25, 100);
 }

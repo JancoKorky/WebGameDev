@@ -15,3 +15,10 @@ typenum = ktore / mozno uz rovno dat percentualne
 //    playerBtnEnable = true
 
 countFestMove - ak nie je 0 tak - farbicky na aktivne kôpky
+
+
+
+
+potrebujem update na score
+potrebujem obrazky
+a asi jebem na to
