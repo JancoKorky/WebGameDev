@@ -15,7 +15,13 @@ exports.login = (req, res, next) => {
           .execute("INSERT INTO user (username, password) VALUES (?, ?)", [user, pass])
           .then((result) => {
             dbase
-              .execute("SELECT userID FROM User WHERE username='" + user + "' AND password = '" + pass + "'")
+              .execute(
+                "SELECT userID, username, score, newgame FROM User WHERE username='" +
+                  user +
+                  "' AND password = '" +
+                  pass +
+                  "'"
+              )
               .then((result) => {
                 const [newResult] = result[0];
 
@@ -66,34 +72,6 @@ exports.login = (req, res, next) => {
     });
 };
 
-exports.getPlayerDeck = (req, res, next) => {
-  const userID = req.params.userID;
-
-  dbase
-    .execute("SELECT * FROM playerDeck WHERE userID='" + userID + "'")
-    .then((result) => {
-      const [newResult] = result[0];
-      res.json(newResult);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
-exports.getFestivalDeck = (req, res, next) => {
-  const userID = req.params.userID;
-
-  dbase
-    .execute("SELECT * FROM festivalDeck WHERE userID='" + userID + "'")
-    .then((result) => {
-      const [newResult] = result[0];
-      res.json(newResult);
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
 exports.resetID = (req, res, next) => {
   const userID = req.params.userID;
 
@@ -113,4 +91,13 @@ exports.resetID = (req, res, next) => {
     .catch((err) => {
       console.log(err);
     });
+};
+
+exports.updateScore = (req, res, next) => {
+  const userID = req.params.userID;
+  const score = req.body.score;
+
+  dbase.execute("UPDATE user SET score=" + score + " WHERE " + userID).then((result) => {
+    res.send({ sucess: true });
+  });
 };

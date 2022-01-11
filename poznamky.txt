@@ -19,8 +19,10 @@ countFestMove - ak nie je 0 tak - farbicky na aktivne kôpky
 
 
 
-    potrebujem update na score
+OK  potrebujem pockat pre polozenie druhej festival tile
+nok potrebujem update na score - potrebuje to opravit pri polozeni festivalTile -> ten by mal pocitat skore druhým hracom
+        checkScoreForPlacedPlayerTile
+
     potrebujem save na board
     potrebujem obrazky
-OK  potrebujem pockat pre polozenie druhej festival tile
 a asi jebem na to

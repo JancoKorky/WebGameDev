@@ -21,6 +21,8 @@ let festivalBtn2 = undefined;
 let selectedPlayer = undefined;
 let selectedFest = undefined;
 
+let posForScore = {};
+
 let countFestMove = 0;
 
 // THERE IS CONFIGURATION OF TILES
@@ -42,12 +44,13 @@ let playerType = [];
 let festivalType = [];
 
 // playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
-//   playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
+// playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
 
 function setup() {
   // socket = io.connect("http://localhost:3000");
   createCanvas(windowWidth, windowHeight - 1);
   constructBoard(BOARD_TILES);
+  setPlayer1Status();
 
   usernameInput = createInput("UserName");
   usernameInput.position(width / 2 - 75, height / 2 - 25);
@@ -59,7 +62,6 @@ function setup() {
   loginBTN.position(width / 2 - 75, height / 2 + 30);
   loginBTN.mousePressed(doLogin);
 
-  setPlayer1Status();
   setPileStatus();
   setSelectedDecks();
 }
@@ -184,8 +186,8 @@ function updateFestivalDeck() {
     }
   }
 
-  dataDeckUpdate = beforeUpdateCheckFestBTN(festivalBtn1, dataDeckUpdate)
-  dataDeckUpdate = beforeUpdateCheckFestBTN(festivalBtn2, dataDeckUpdate)
+  dataDeckUpdate = beforeUpdateCheckFestBTN(festivalBtn1, dataDeckUpdate);
+  dataDeckUpdate = beforeUpdateCheckFestBTN(festivalBtn2, dataDeckUpdate);
 
   httpPost("/updateFestivalDeck/" + userID, "json", dataDeckUpdate, (result) => {});
 }
@@ -317,27 +319,33 @@ function mousePressed() {
           if (buildID == 0 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 0);
             arrTiles[indexI][indexJ].draw_Tile();
+            posForScore = {
+              posX: indexI,
+              posY: indexJ,
+              buildID: buildID,
+            };
             checkWhichPlayerBtnRemove(removePlayerBtn);
+            // httpPost posForScore insert1
           } else if (buildID == 1 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 1);
             arrTiles[indexI][indexJ].draw_Tile();
+            posForScore = {
+              posX: indexI,
+              posY: indexJ,
+              buildID: buildID,
+            };
             checkWhichPlayerBtnRemove(removePlayerBtn);
-            // let house = {
-            //   posX: indexI,
-            //   posY: indexJ,
-            //   userID: userID,
-            // };
-            // httpPost("/insertHouse", "json", house, (resposta) => {});
+            // httpPost posForScore insert2
           } else if (buildID == 2 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 2);
             arrTiles[indexI][indexJ].draw_Tile();
+            posForScore = {
+              posX: indexI,
+              posY: indexJ,
+              buildID: buildID,
+            };
             checkWhichPlayerBtnRemove(removePlayerBtn);
-            // let farm = {
-            //   posX: indexI,
-            //   posY: indexJ,
-            //   userID: userID,
-            // };
-            // httpPost("/insertFarm", "json", farm, (resposta) => {});
+            // httpPost posForScore insert3
           }
           switch (buildFestID) {
             case 0:
@@ -411,10 +419,11 @@ function mousePressed() {
               }
               break;
           }
-          // console.log(countFestMove);
-          // boardEnable = false;
-          // buildFestID = undefined;
+
           if (!countFestMove) {
+            userPlayer.score += checkScoreForPlacedPlayerTile(posForScore);
+            httpDo("/score/" + userID, "PUT", { score: userPlayer.score }, "json", () => {});
+
             playerBtnEnable = true;
             selectRandomFestivalTileType(festivalBtn1);
             selectRandomFestivalTileType(festivalBtn2);
@@ -536,7 +545,7 @@ function constructBoard(numberOfTiles) {
     center--;
   }
 
-  arrTiles[center][center].setTypes(1, 5);
+  arrTiles[center][center].setTypes(1, 4);
   arrTiles[center + 1][center + 1].setTypes(1, 8);
 }
 
@@ -664,6 +673,28 @@ function posibleFestivalTile() {
       }
     }
   }
+}
+
+function checkScoreForPlacedPlayerTile(position) {
+  // console.log(position);
+
+  let tilesScore = 0;
+
+  const tilesPoints = [
+    arrTiles[position.posX - 1][position.posY].points,
+    arrTiles[position.posX][position.posY - 1].points,
+    arrTiles[position.posX + 1][position.posY].points,
+    arrTiles[position.posX][position.posY + 1].points,
+  ];
+  // console.log(tilesPoints);
+
+  tilesPoints.forEach((tile) => {
+    if (tile != undefined) {
+      tilesScore += tile * (position.buildID + 1);
+    }
+  });
+  // console.log(tilesScore);
+  return tilesScore;
 }
 
 function setSelectedDecks() {

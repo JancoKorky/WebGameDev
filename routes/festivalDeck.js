@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const playerDeckController = require("../controllers/festivalDeckController");
+const controller = require("../controllers/festivalDeckController");
 
-router.post("/updateFestivalDeck/:userID", playerDeckController.updateFestivalDeck);
+router.post("/updateFestivalDeck/:userID", controller.updateFestivalDeck);
+router.get('/getFestivalDeck/:userID', controller.getFestivalDeck)
 
 module.exports = router;

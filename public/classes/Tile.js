@@ -9,12 +9,14 @@ class Tile {
     this.type = undefined;
     this.typeNum = undefined;
     this.tileEnable = false;
+    this.points = undefined;
   }
 
   setTypes(type, typeNum) {
     this.type = type;
     this.typeNum = typeNum;
-    this.setColor();
+    // this.setPoints();
+    this.setColorAndPoints();
   }
 
   draw_Tile() {
@@ -40,7 +42,7 @@ class Tile {
     }
   }
 
-  setColor() {
+  setColorAndPoints() {
     if (this.type == 0) {
       switch (this.typeNum) {
         case 0:
@@ -60,33 +62,43 @@ class Tile {
     if (this.type == 1) {
       switch (this.typeNum) {
         case 0:
+          this.points = 1
           this.color = "#fff";
           break;
         case 1:
+          this.points = 2
           this.color = "#f2faff";
           break;
         case 2:
+          this.points = 6
           this.color = "#e1f3ff";
           break;
         case 3:
+          this.points = 3
           this.color = "#d0ecff";
           break;
         case 4:
+          this.points = -5
           this.color = "#bfe6ff";
           break;
         case 5:
+          this.points = -3
           this.color = "#7bcbff";
           break;
         case 6:
+          this.points = -6
           this.color = "#59beff";
           break;
         case 7:
+          this.points = -1
           this.color = "#37b0ff";
           break;
         case 8:
+          this.points = -2
           this.color = "#15a3ff";
           break;
         case 9:
+          this.points = -4
           this.color = "#0093f2";
           break;
         case undefined:

@@ -1,8 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const socket = require("socket.io");
+// const socket = require("socket.io");
 
-const dbase = require("./util/database");
+// const dbase = require("./util/database");
 const app = express();
 const port = 3000;
 
