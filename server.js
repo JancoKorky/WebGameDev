@@ -19,10 +19,13 @@ app.use(express.static("public"));
 const user = require("./routes/user");
 const playerDeck = require("./routes/playerDeck");
 const festivalDeck = require("./routes/festivalDeck");
+const board = require("./routes/board");
+
 // app.use("/test", testRoutes);
 app.use(user);
 app.use(playerDeck);
 app.use(festivalDeck);
+app.use(board);
 
 // setup socket
 app.listen(port, () => {

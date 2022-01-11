@@ -92,6 +92,7 @@ function doLogin() {
     }
 
     loadDeck();
+    loadBoard();
 
     mainScene = true;
   });
@@ -197,6 +198,10 @@ function loadDeck() {
   loadJSON("/getFestivalDeck/" + userID, loadFestivalDeck);
 }
 
+function loadBoard() {
+  loadJSON("/getBoard/" + userID, loadDrawBoard);
+}
+
 function loadPlayerDeck(serverData) {
   playerType = [];
   for (let index = 0; index < serverData.times_one; index++) {
@@ -245,18 +250,13 @@ function loadFestivalDeck(serverData) {
   }
 }
 
-// function loadTilesPlaced() {
-//   loadJSON("/get/" + userID, (dataDoServidor) => {
-//     if (dataDoServidor.length > 0) {
-//       housesReceived = dataDoServidor;
-//       for (let i = 0; i < housesReceived.length; i++) {
-//         arrTiles[housesReceived[i].posX][housesReceived[i].posY].clr = 0;
-//       }
-//     } else {
-//       alert("no houses");
-//     }
-//   });
-// }
+function loadDrawBoard(serverData) {
+  if (serverData.length > 0) {
+    serverData.forEach((element) => {
+      arrTiles[element.posX][element.posY].setTypes(element.type,element.typeNum);
+    });
+  }
+}
 
 function draw() {
   background(50);
@@ -322,18 +322,23 @@ function mousePressed() {
             posForScore = {
               posX: indexI,
               posY: indexJ,
+              type: 0,
+              typeNum: 0,
               buildID: buildID,
             };
+            httpPost("/postBoard/" + userID, "json", posForScore);
             checkWhichPlayerBtnRemove(removePlayerBtn);
-            // httpPost posForScore insert1
           } else if (buildID == 1 && arrTiles[indexI][indexJ].tileEnable) {
             arrTiles[indexI][indexJ].setTypes(0, 1);
             arrTiles[indexI][indexJ].draw_Tile();
             posForScore = {
               posX: indexI,
               posY: indexJ,
+              type: 0,
+              typeNum: 1,
               buildID: buildID,
             };
+            httpPost("/postBoard/" + userID, "json", posForScore);
             checkWhichPlayerBtnRemove(removePlayerBtn);
             // httpPost posForScore insert2
           } else if (buildID == 2 && arrTiles[indexI][indexJ].tileEnable) {
@@ -342,17 +347,31 @@ function mousePressed() {
             posForScore = {
               posX: indexI,
               posY: indexJ,
+              type: 0,
+              typeNum: 2,
               buildID: buildID,
             };
+            httpPost("/postBoard/" + userID, "json", posForScore);
             checkWhichPlayerBtnRemove(removePlayerBtn);
             // httpPost posForScore insert3
           }
+          // -------------------
+          // for festival button
+          let boardTilesData = {};
+
           switch (buildFestID) {
             case 0:
               if (arrTiles[indexI][indexJ].tileEnable) {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 0);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 0,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 1:
@@ -360,6 +379,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 1);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 1,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 2:
@@ -367,6 +393,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 2);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 2,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 3:
@@ -374,6 +407,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 3);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 3,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 4:
@@ -381,6 +421,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 4);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 4,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 5:
@@ -388,6 +435,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 5);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 5,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 6:
@@ -395,6 +449,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 6);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 6,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 7:
@@ -402,6 +463,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 7);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 7,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 8:
@@ -409,6 +477,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 8);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 8,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
             case 9:
@@ -416,6 +491,13 @@ function mousePressed() {
                 setTypePlusDraw(arrTiles[indexI][indexJ], 1, 9);
                 checkWhichFestBtnRemove(removeFestBtn);
                 countFestMove--;
+                boardTilesData = {
+                  posX: indexI,
+                  posY: indexJ,
+                  type: 1,
+                  typeNum: 9,
+                };
+                httpPost("/postBoard/" + userID, "json", boardTilesData);
               }
               break;
           }
