@@ -97,7 +97,7 @@ function doLogin() {
 
 function resetGameForPlayerID(userID) {
   httpDo("/resetID/" + userID, "PUT", "json", undefined, (serverData) => {
-    console.log(serverData);
+    // console.log(serverData);
     userNewGame = serverData.newgame;
     userPlayer.score = serverData.score;
 
@@ -184,49 +184,9 @@ function updateFestivalDeck() {
     }
   }
 
-  if (festivalBtn1.id == 0) {
-    dataDeckUpdate.beerTent++;
-  } else if (festivalBtn1.id == 1) {
-    dataDeckUpdate.beerTentStrong++;
-  } else if (festivalBtn1.id == 2) {
-    dataDeckUpdate.barStrong++;
-  } else if (festivalBtn1.id == 3) {
-    dataDeckUpdate.bar++;
-  } else if (festivalBtn1.id == 4) {
-    dataDeckUpdate.stage++;
-  } else if (festivalBtn1.id == 5) {
-    dataDeckUpdate.chillzone++;
-  } else if (festivalBtn1.id == 6) {
-    dataDeckUpdate.refreshment++;
-  } else if (festivalBtn1.id == 7) {
-    dataDeckUpdate.forestToi++;
-  } else if (festivalBtn1.id == 8) {
-    dataDeckUpdate.toitoi++;
-  } else if (festivalBtn1.id == 9) {
-    dataDeckUpdate.cleanToi++;
-  }
+  dataDeckUpdate = beforeUpdateCheckFestBTN(festivalBtn1, dataDeckUpdate)
+  dataDeckUpdate = beforeUpdateCheckFestBTN(festivalBtn2, dataDeckUpdate)
 
-  if (festivalBtn2.id == 0) {
-    dataDeckUpdate.beerTent++;
-  } else if (festivalBtn2.id == 1) {
-    dataDeckUpdate.beerTentStrong++;
-  } else if (festivalBtn2.id == 2) {
-    dataDeckUpdate.barStrong++;
-  } else if (festivalBtn2.id == 3) {
-    dataDeckUpdate.bar++;
-  } else if (festivalBtn2.id == 4) {
-    dataDeckUpdate.stage++;
-  } else if (festivalBtn2.id == 5) {
-    dataDeckUpdate.chillzone++;
-  } else if (festivalBtn2.id == 6) {
-    dataDeckUpdate.refreshment++;
-  } else if (festivalBtn2.id == 7) {
-    dataDeckUpdate.forestToi++;
-  } else if (festivalBtn2.id == 8) {
-    dataDeckUpdate.toitoi++;
-  } else if (festivalBtn2.id == 9) {
-    dataDeckUpdate.cleanToi++;
-  }
   httpPost("/updateFestivalDeck/" + userID, "json", dataDeckUpdate, (result) => {});
 }
 
@@ -456,12 +416,13 @@ function mousePressed() {
           // buildFestID = undefined;
           if (!countFestMove) {
             playerBtnEnable = true;
+            selectRandomFestivalTileType(festivalBtn1);
+            selectRandomFestivalTileType(festivalBtn2);
           }
 
           selectRandomPlayerTileTypeFromPile(playerBtn1);
           selectRandomPlayerTileTypeFromPile(playerBtn2);
-          selectRandomFestivalTileType(festivalBtn1);
-          selectRandomFestivalTileType(festivalBtn2);
+
           updatePlayerDeck();
           updateFestivalDeck();
         }
@@ -477,7 +438,6 @@ function setPlayer1Status() {
   // tu som skoncil s geterom seterom potrebujem urobit zmenu score na zaklade niecoho, a rozchodit buttony -tu to asi bude vsetka logika
   selectRandomPlayerTileTypeFromPile(playerBtn1);
   selectRandomPlayerTileTypeFromPile(playerBtn2);
-  
 }
 
 function setPileStatus() {
@@ -490,7 +450,6 @@ function setPileStatus() {
 
 function selectRandomPlayerTileTypeFromPile(playerBtn) {
   if (playerBtn.id == undefined && playerType.length > 0) {
-    console.log("ptype ", playerType, " pbtn: ", playerBtn.id);
     const random = Math.floor(Math.random() * playerType.length);
 
     switch (playerType[random]) {
