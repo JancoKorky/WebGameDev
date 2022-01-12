@@ -1,18 +1,20 @@
 class TileButton {
-  constructor(posX, posY) {
+  constructor(posX, posY, images) {
     this.posX = posX;
     this.posY = posY;
     this.id = undefined;
     this.color = "rgba(0,0,0,0)";
+    this.images = images;
+    this.image = undefined;
+    this.widthBtn = 50;
   }
 
   draw_Button() {
     push();
     fill(this.color);
-    square(this.posX, this.posY, 50, 5);
+    square(this.posX, this.posY, this.widthBtn, 5);
     if (this.id != undefined) {
-      fill(0);
-      text(this.id, this.posX + 23, this.posY + 27);
+      image(this.image, this.posX, this.posY, this.widthBtn, this.widthBtn)
     }
     pop();
   }
@@ -33,16 +35,13 @@ class TileButton {
 
   setColor() {
     if (this.id == 0) {
-      this.color = "#f50";
+      this.image = this.images.man;
     }
     if (this.id == 1) {
-      this.color = "#ff0";
+      this.image = this.images.man2x;
     }
     if (this.id == 2) {
-      this.color = "#0f5";
-    }
-    if (this.id == undefined) {
-      this.color = "rgba(0,0,0,0)";
+      this.image = this.images.man3x;
     }
   }
 }

@@ -11,4 +11,5 @@ nok     potrebujem update na score - potrebuje to opravit pri polozeni festivalT
             checkScoreForPlacedPlayerTile
 OK      potrebujem save na board
 
--       potrebujem obrazky
+OK       potrebujem obrazky
+

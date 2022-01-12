@@ -46,6 +46,39 @@ let festivalType = [];
 // playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
 // playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
 
+let festImages = {};
+
+function preload() {
+  const beer = loadImage("assets/beer.png");
+  const beer2x = loadImage("assets/beer2x.png");
+  const shot = loadImage("assets/shot.png");
+  const shot2x = loadImage("assets/shot2x.png");
+  const stage = loadImage("assets/stage.png");
+  const chill = loadImage("assets/chill.png");
+  const refreshment = loadImage("assets/refreshment.png");
+  const ftoi = loadImage("assets/ftoi.png");
+  const toitoi = loadImage("assets/toitoi.png");
+  const toilet = loadImage("assets/toilet.png");
+  const man = loadImage("assets/man.png");
+  const man2x = loadImage("assets/man2x.png");
+  const man3x = loadImage("assets/man3x.png");
+  festImages = {
+    beer: beer,
+    beer2x: beer2x,
+    shot: shot,
+    shot2x: shot2x,
+    stage: stage,
+    chill: chill,
+    refreshment: refreshment,
+    ftoi: ftoi,
+    toitoi: toitoi,
+    toilet: toilet,
+    man: man,
+    man2x: man2x,
+    man3x: man3x,
+  };
+}
+
 function setup() {
   // socket = io.connect("http://localhost:3000");
   createCanvas(windowWidth, windowHeight - 1);
@@ -253,7 +286,7 @@ function loadFestivalDeck(serverData) {
 function loadDrawBoard(serverData) {
   if (serverData.length > 0) {
     serverData.forEach((element) => {
-      arrTiles[element.posX][element.posY].setTypes(element.type,element.typeNum);
+      arrTiles[element.posX][element.posY].setTypes(element.type, element.typeNum);
     });
   }
 }
@@ -274,6 +307,11 @@ function showScoreDeskAndButtons() {
 
   playerBtn1.draw_Button();
   playerBtn2.draw_Button();
+  push();
+  textSize(20);
+  fill(255);
+  text("Festival Pile", BOARD_TILES + (1 + BOARD_TILES) * 50, windowHeight / 2 - 35);
+  pop();
   festivalBtn1.draw_Button();
   festivalBtn2.draw_Button();
   userPlayer.drawPlayerScore();
@@ -501,6 +539,9 @@ function mousePressed() {
 
           if (!countFestMove) {
             userPlayer.score += checkScoreForPlacedPlayerTile(posForScore);
+            if (userPlayer.score < 0) userPlayer.score = 0;
+            else if (userPlayer.score > 100) userPlayer.score = 100;
+
             httpDo("/score/" + userID, "PUT", { score: userPlayer.score }, "json", () => {});
 
             playerBtnEnable = true;
@@ -520,17 +561,25 @@ function mousePressed() {
 }
 
 function setPlayer1Status() {
-  playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50);
-  playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50);
-  userPlayer = new Player("", BOARD_TILES + (1 + BOARD_TILES) * 50, 130);
-  
+  playerBtn1 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50, 50, ({ man, man2x, man3x } = festImages));
+  playerBtn2 = new TileButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, 50, ({ man, man2x, man3x } = festImages));
+  userPlayer = new Player("", BOARD_TILES + (1 + BOARD_TILES) * 50, 120);
+
   selectRandomPlayerTileTypeFromPile(playerBtn1);
   selectRandomPlayerTileTypeFromPile(playerBtn2);
 }
 
 function setPileStatus() {
-  festivalBtn1 = new FestivalButton(BOARD_TILES + (1 + BOARD_TILES) * 50, windowHeight / 2);
-  festivalBtn2 = new FestivalButton(BOARD_TILES + (1 + BOARD_TILES) * 50 + 70, windowHeight / 2);
+  festivalBtn1 = new FestivalButton(
+    BOARD_TILES + (1 + BOARD_TILES) * 50,
+    windowHeight / 2,
+    ({ beer, beer2x, shot, shot2x, stage, chill, refreshment, ftoi, toitoi, toilet } = festImages)
+  );
+  festivalBtn2 = new FestivalButton(
+    BOARD_TILES + (1 + BOARD_TILES) * 50 + 70,
+    windowHeight / 2,
+    ({ beer, beer2x, shot, shot2x, stage, chill, refreshment, ftoi, toitoi, toilet } = festImages)
+  );
 
   selectRandomFestivalTileType(festivalBtn1);
   selectRandomFestivalTileType(festivalBtn2);
@@ -599,7 +648,7 @@ function constructBoard(numberOfTiles) {
   for (let i = 0; i < numberOfTiles; i++) {
     arrTiles[i] = [];
     for (let j = 0; j < numberOfTiles; j++) {
-      arrTiles[i][j] = new Tile(i + i * 50, j + j * 50, i, j, 50);
+      arrTiles[i][j] = new Tile(i + i * 50, j + j * 50, i, j, 50, festImages);
     }
   }
   // set starting tiles
@@ -751,10 +800,12 @@ function checkScoreForPlacedPlayerTile(position) {
 
   tilesPoints.forEach((tile) => {
     if (tile != undefined) {
+      console.log(tile)
       tilesScore += tile * (position.buildID + 1);
     }
   });
-  
+  console.log(tilesScore)
+
   return tilesScore;
 }
 

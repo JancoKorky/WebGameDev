@@ -1,18 +1,20 @@
 class FestivalButton {
-  constructor(posX, posY) {
+  constructor(posX, posY, images) {
     this.posX = posX;
     this.posY = posY;
     this.id = undefined;
     this.color = "rgba(0,0,0,0)";
+    this.images = images;
+    this.image = undefined;
+    this.widthBtn = 50;
   }
 
   draw_Button() {
     push();
     fill(this.color);
-    square(this.posX, this.posY, 50, 5);
+    square(this.posX, this.posY, this.widthBtn, 5);
     if (this.id != undefined) {
-      fill(0);
-      text(this.id + 1, this.posX + 22, this.posY + 27);
+      image(this.image, this.posX, this.posY, this.widthBtn, this.widthBtn)
     }
     pop();
   }
@@ -27,42 +29,39 @@ class FestivalButton {
 
   setBtnType(id) {
     this.id = id;
-    this.setColor();
+    this.setImage();
   }
 
-  setColor() {
+  setImage() {
     if (this.id == 0) {
-      this.color = "#fff";
+      this.image = this.images.beer;
     }
     if (this.id == 1) {
-      this.color = "#f2faff";
+      this.image = this.images.beer2x;
     }
     if (this.id == 2) {
-      this.color = "#e1f3ff";
+      this.image = this.images.shot;
     }
     if (this.id == 3) {
-      this.color = "#d0ecff";
+      this.image = this.images.shot2x;
     }
     if (this.id == 4) {
-      this.color = "#bfe6ff";
+      this.image = this.images.stage;
     }
     if (this.id == 5) {
-      this.color = "#7bcbff";
+      this.image = this.images.chill;
     }
     if (this.id == 6) {
-      this.color = "#59beff";
+      this.image = this.images.refreshment;
     }
     if (this.id == 7) {
-      this.color = "#37b0ff";
+      this.image = this.images.ftoi;
     }
     if (this.id == 8) {
-      this.color = "#15a3ff";
+      this.image = this.images.toitoi;
     }
     if (this.id == 9) {
-      this.color = "#0093f2";
-    }
-    if (this.id == undefined) {
-      this.color = "rgba(0,0,0,0)";
+      this.image = this.images.toilet;
     }
   }
 }

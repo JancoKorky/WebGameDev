@@ -12,7 +12,8 @@ class Player {
     textSize(15);
     fill(255);
     noStroke();
-    text(this.name + " score: " + this.score, this.posX, this.posY);
+    text("Player: " + this.name, this.posX, this.posY);
+    text("Drunk: " + this.score + "%", this.posX, this.posY + 15);
     pop();
   }
 }
